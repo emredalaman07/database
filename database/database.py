@@ -213,14 +213,17 @@ def update(line, tables):
             return
 
     # Iterate through the rows and update values where the condition is met.
-    for key_1, value_1 in update_location_dictionary.items():
-        if key_1 in columns:
-            for index, value_2 in enumerate(columns[key_1]):
-                if str(value_1) == value_2:
-                    updated_rows += 1
-                    for key_3, value_3 in the_element_to_be_updated_dictionary.items():
-                        if key_3 in columns:
-                            columns[key_3][index] = str(value_3)
+    number_of_rows = len(list(columns.values())[0])
+    for index in range(number_of_rows):
+        for key_1, value_1 in update_location_dictionary.items():
+            if key_1 in columns:
+                if columns[key_1][index] != str(value_1):
+                    break
+        else:
+            updated_rows += 1
+            for key_3, value_3 in the_element_to_be_updated_dictionary.items():
+                if key_3 in columns:
+                    columns[key_3][index] = str(value_3)
 
     table = table_structure(columns)
     standardized_the_element_to_be_updated = str(the_element_to_be_updated_dictionary).replace('"', "'")
@@ -240,9 +243,7 @@ def delete(line, tables):
         try:
             columns = tables[table_name]
         except KeyError:
-            standardized_the_element_to_be_deleted = str(the_element_to_be_deleted_dictionary).replace("'", "'")
             print("#" * 22 + " DELETE " + "#" * 25)
-            print(f"Deleted from '{table_name}' where {standardized_the_element_to_be_deleted}")
             print(f"Table {table_name} not found")
             print(f"{0} rows deleted.")
             print("#" * 55 + "\n")
@@ -359,7 +360,7 @@ def count(line, tables):
         for key_1, value_1 in element_to_be_counted_dictionary.items():
             # Check if the condition is not met for the current row.
             if key_1 in columns:
-                if columns[key_1][i] != value_1:
+                if columns[key_1][i] != str(value_1):
                     break
         else:
             count += 1
@@ -440,7 +441,7 @@ def join(line, tables):
 
 def main():
     tables = {}
-    with (open(argv[1], "r") as text_file_input):
+    with open(argv[1], "r", encoding="utf-8-sig") as text_file_input:
         for line in text_file_input:
             line = line.strip()
             if line.startswith("CREATE_TABLE"):
